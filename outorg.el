@@ -1,8 +1,8 @@
 ;;; outorg.el --- Org-style comment editing
 
-;; Author: Thorsten Jolitz <tjolitz AT gmail DOT com>
+;; Author: Adam Porter
 ;; Version: 2.0
-;; URL: https://github.com/tj64/outorg
+;; URL: https://github.com/alphapapa/outorg
 
 ;;;; MetaData
 ;;   :PROPERTIES:
@@ -12,12 +12,11 @@
 ;;   :licence:  GPL 2 or later (free software)
 ;;   :licence-url: http://www.gnu.org/licenses/
 ;;   :part-of-emacs: no
-;;   :author: Thorsten Jolitz
-;;   :author_email: tjolitz AT gmail DOT com
+;;   :author: Adam Porter
 ;;   :inspiration:  org-src
 ;;   :keywords: emacs org-mode comment-editing
-;;   :git-repo: https://github.com/tj64/outorg
-;;   :git-clone: git://github.com/tj64/outorg.git
+;;   :git-repo: https://github.com/alphapapa/outorg
+;;   :git-clone: git://github.com/alphapapa/outorg.git
 ;;   :END:
 
 ;;;; Commentary

@@ -13,9 +13,9 @@
 
 # outorg.el &#x2014; Org-style comment editing<a id="sec-1"></a>
 
-Author: Thorsten Jolitz <tjolitz AT gmail DOT com>
+Author: Adam Porter
 Version: 2.0
-URL: <https://github.com/tj64/outorg>
+URL: <https://github.com/alphapapa/outorg>
 
 ## MetaData<a id="sec-1-1"></a>
 
@@ -31,17 +31,15 @@ URL: <https://github.com/tj64/outorg>
     
     part-of-emacs: no
     
-    author: Thorsten Jolitz
-    
-    author_email: tjolitz AT gmail DOT com
+    author: Adam Porter
     
     inspiration: org-src
     
     keywords: emacs org-mode comment-editing
     
-    git-repo: https://github.com/tj64/outorg
+    git-repo: https://github.com/alphapapa/outorg
     
-    git-clone: git://github.com/tj64/outorg.git
+    git-clone: git://github.com/alphapapa/outorg.git
 
 ## Commentary<a id="sec-1-2"></a>
 
