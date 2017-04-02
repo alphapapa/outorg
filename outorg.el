@@ -3,6 +3,7 @@
 ;; Author: Adam Porter
 ;; Version: 2.0
 ;; URL: https://github.com/alphapapa/outorg
+;; Package-Requires: ((emacs "24.4"))
 
 ;;;; MetaData
 ;;   :PROPERTIES:
