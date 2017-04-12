@@ -483,7 +483,7 @@ returned."
                      ((stringp mode-name) (intern mode-name))
                      ((symbolp mode-name) mode-name)
                      (t (error "Mode-Name neither String nor Symbol")))
-		 major-mode))
+                  major-mode))
          (bname (or (cdr (assoc mmode outorg-language-name-assocs))
                     ;; Not found in alist; just use major-mode name without "-mode" suffix
                     (intern (replace-regexp-in-string "-mode$" "" (symbol-name mmode))))))
@@ -1428,9 +1428,9 @@ before this function is called."
          (regexp (if example-block-p
                      (concat "\\(?:#\\+begin_example" "[^\000]*?\n#\\+end_example\\)") ; NUL char
                    (format "%s%s%s"
-		      "\\(?:^#\\+begin_src[[:space:]]+"
-		      (regexp-quote (outorg-get-babel-name buffer-mode 'AS-STRG-P))
-		      "[^\000]*?\n#\\+end_src\\)")))
+                           "\\(?:^#\\+begin_src[[:space:]]+"
+                           (regexp-quote (outorg-get-babel-name buffer-mode 'AS-STRG-P))
+                           "[^\000]*?\n#\\+end_src\\)")))
 	 (first-block-p t))
 
     ;; 1st run: outcomment text, delete (active) block delimiters
@@ -1445,7 +1445,7 @@ before this function is called."
       (if first-block-p
           (progn
             ;; Handle first block
-	    (move-marker outorg-beginning-of-code (match-beginning 0))
+            (move-marker outorg-beginning-of-code (match-beginning 0))
 	    (move-marker outorg-end-of-code (match-end 0))
             (if (eq (point-min) (match-beginning 0))
                 (goto-char (match-end 0))
@@ -1489,8 +1489,8 @@ before this function is called."
       (while (re-search-forward "\\(^;;\\)\\( [*]+\\)\\( \\)" nil 'NOERROR)
 	(let* ((org-header-level (- (length (match-string-no-properties 0)) 4))
 	       (replacement-string (let ((strg ";"))
-		  (dotimes (i (1- org-header-level) strg)
-		    (setq strg (concat strg ";"))))))
+                                     (dotimes (i (1- org-header-level) strg)
+                                       (setq strg (concat strg ";"))))))
           (replace-match replacement-string nil nil nil 2))))))
 ;; ;; finally remove trailing empty lines REALLY?
 ;; (outorg-remove-trailing-blank-lines))
