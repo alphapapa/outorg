@@ -1573,6 +1573,8 @@ With ARG, act conditional on the raw value of ARG:
 
 "
   (interactive "P")
+  (unless outline-minor-mode
+    (error "Activate `outline-minor-mode' to use `outorg'"))
   (ignore-errors
     (outorg-reset-global-vars))
   (and buffer-file-read-only
