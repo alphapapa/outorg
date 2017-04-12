@@ -27,7 +27,7 @@
 ;; temporary Org-mode buffers. It turns conventional
 ;; literate-programming upside-down in that the default mode is the
 ;; programming-mode, and special action has to be taken to switch to the
-;; text-mode (i.e. Org-mode). 
+;; text-mode (i.e. Org-mode).
 
 ;; Outorg depends on Outshine, i.e. outline-minor-mode with outshine
 ;; extensions activated. An outshine buffer is structured like an
@@ -62,12 +62,12 @@
 ;; Outorg (like outshine) assumes that you set
 ;; `outline-minor-mode-prefix' in your init-file to 'M-#':
 
-;; #+BEGIN_EXAMPLE 
+;; #+BEGIN_EXAMPLE
 ;; ;; must be set before outline is loaded
 ;; (defvar outline-minor-mode-prefix "\M-#")
 ;; #+END_EXAMPLE
 
-;; Outorg's main command is 
+;; Outorg's main command is
 
 ;; #+begin_example
 ;;   M-# # (or M-x outorg-edit-as-org)
@@ -114,7 +114,7 @@
 
 ;; in your init file. When you use navi-mode.el too, the third Outshine
 ;; library, it suffices to (require 'navi), since it requires the other
-;; two libraries. 
+;; two libraries.
 
 ;;;;; Bugs and Shortcomings
 
@@ -445,7 +445,7 @@ comment syntax, while the returned point is at the beginning of
 the line."
   (while (not (or (eobp) (outorg-comment-on-line))) (forward-line))
   (point-at-bol))
- 
+
 ;; copied from http://www.emacswiki.org/emacs/basic-edit-toolkit.el
 (defun outorg-region-or-buffer-limits ()
   "Return the start and end of the region as a list, smallest first.
@@ -506,7 +506,7 @@ is returned."
 	 (car
 	  (rassoc bname outorg-language-name-assocs))))
     (if as-strg-p (symbol-name mmode) mmode)))
-  
+
 (defun outorg-get-language-name (&optional mode-name as-sym-p)
   "Extract car of splitted and normalized MODE-NAME.
 
@@ -569,13 +569,13 @@ If MODE-NAME is nil, check if Org-Babel identifier of major-mode of current buff
                     (when (string= (buffer-name) outorg-edit-buffer-name)
                       (outorg-save-edits-to-tmp-file)))
                   nil 'local)
-    
+
     (org-add-hook 'kill-buffer-hook
                   (lambda ()
                     (when (string= (buffer-name) outorg-edit-buffer-name)
                       (outorg-reset-global-vars)) nil 'local))
 
-    
+
     ;; (setq buffer-offer-save t)
     (and outorg-edit-buffer-persistent-message
          (setq-local header-line-format msg))
@@ -1093,7 +1093,7 @@ buffer the '\(********\)' line is found again."
   (let ((show-trailing-whitespace nil))
     (kill-line 2))
   (insert "\"")
-  (re-search-forward final-line  nil 'NOERROR)   
+  (re-search-forward final-line  nil 'NOERROR)
   (beginning-of-line)
   (re-search-backward "[[:alnum:][:punct:]]" nil 'NOERROR)
   (forward-char)
@@ -1177,7 +1177,7 @@ If `outorg-edit-whole-buffer' is non-nil, copy the whole buffer, otherwise
     (if (one-window-p) (split-window-sensibly (get-buffer-window)))
     (switch-to-buffer-other-window edit-buffer)
     ;; reinstall outorg-markers
-    (outorg-reinstall-markers-in-region (point-min))  
+    (outorg-reinstall-markers-in-region (point-min))
     ;; set point
     (goto-char outorg-edit-buffer-point-marker)
     ;; activate programming language major mode and convert to org
@@ -1224,7 +1224,7 @@ source-block. Use `outorg-pt-B-marker' and
 `outorg-pt-C-marker' to find start and end position of
 block."
   (save-excursion
-    ;; begin of block			
+    ;; begin of block
     (goto-char outorg-pt-B-marker)
     (newline)
     (forward-line -1)
@@ -1282,7 +1282,7 @@ space."
 	 (example-block-p
 	  (not
 	   (outorg-in-babel-load-languages-p buffer-mode))))
-    
+
     (outorg-remove-trailing-blank-lines)
     ;; reset (left-over) markers
     (move-marker outorg-pt-A-marker nil)
@@ -1434,7 +1434,7 @@ Assume that edit-buffer major-mode has been set back to the
          (buffer-mode (outorg-get-buffer-mode))
          (in-org-babel-load-languages-p
 	  (outorg-in-babel-load-languages-p buffer-mode))
-	 (rgxp 
+	 (rgxp
 	  (if in-org-babel-load-languages-p
 	      (format "%s%s%s"
 		      "\\(?:^#\\+begin_src[[:space:]]+"
@@ -1442,7 +1442,7 @@ Assume that edit-buffer major-mode has been set back to the
 		       (outorg-get-babel-name
 			buffer-mode 'AS-STRG-P))
 		      "[^\000]*?\n#\\+end_src\\)") ; NUL char
-	    (concat 
+	    (concat
 	     "\\(?:#\\+begin_example"
 	     "[^\000]*?\n#\\+end_example\\)")))
 	 (first-block-p t))
@@ -1641,7 +1641,7 @@ With ARG, act conditional on the raw value of ARG:
 ;;  #+end_src
 
 ;; in global variable `outorg-src-block-data'."
-  
+
 (defun outorg-copy-edits-and-exit ()
   "Replace code-buffer content with (converted) edit-buffer content and
   kill edit-buffer"
@@ -1691,7 +1691,7 @@ With ARG, act conditional on the raw value of ARG:
 			 (save-excursion
 			   (outline-previous-heading)
 			   (point)))
-		       1))    
+		       1))
       ;; special case R-mode
       (if (eq mode 'ess-mode)
 	  (funcall 'R-mode)
@@ -1762,7 +1762,7 @@ With ARG, act conditional on the raw value of ARG:
     (insert
      (concat
       (unless outorg-keep-export-template-p
-        (concat 
+        (concat
         "# <<<*** BEGIN EXPORT TEMPLATE "
         "[edits will be lost at exit] ***>>>\n\n"))
       (format "#+TITLE: %s\n"
