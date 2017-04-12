@@ -1276,7 +1276,8 @@ space."
   "Convert buffer content to Org Syntax"
   (let* ((buffer-mode (outorg-get-buffer-mode (marker-buffer outorg-code-buffer-point-marker)))
 	 (babel-lang (outorg-get-babel-name buffer-mode))
-	 (example-block-p (not (outorg-in-babel-load-languages-p buffer-mode))))
+	 (example-block-p (and (not (outorg-in-babel-load-languages-p buffer-mode))
+                               (not babel-lang))))
 
     (outorg-remove-trailing-blank-lines)
 
@@ -1417,31 +1418,29 @@ converting back from Org to source-code if customizable variable
 (defun outorg-convert-back-to-code ()
   "Convert edit-buffer content back to programming language syntax.
 Assume that edit-buffer major-mode has been set back to the
-  programming-language major-mode of the associated code-buffer
-  before this function is called."
+programming-language major-mode of the associated code-buffer
+before this function is called."
   (let* ((comment-style "plain")	; "multi-line"?
          (buffer-mode (outorg-get-buffer-mode))
-         (in-org-babel-load-languages-p
-	  (outorg-in-babel-load-languages-p buffer-mode))
-	 (rgxp
-	  (if in-org-babel-load-languages-p
-	      (format "%s%s%s"
+         (babel-lang (outorg-get-babel-name buffer-mode))
+         (example-block-p (and (not (outorg-in-babel-load-languages-p buffer-mode))
+                               (not babel-lang)))
+         (regexp (if example-block-p
+                     (concat "\\(?:#\\+begin_example" "[^\000]*?\n#\\+end_example\\)") ; NUL char
+                   (format "%s%s%s"
 		      "\\(?:^#\\+begin_src[[:space:]]+"
-		      (regexp-quote
-		       (outorg-get-babel-name
-			buffer-mode 'AS-STRG-P))
-		      "[^\000]*?\n#\\+end_src\\)") ; NUL char
-	    (concat
-	     "\\(?:#\\+begin_example"
-	     "[^\000]*?\n#\\+end_example\\)")))
+		      (regexp-quote (outorg-get-babel-name buffer-mode 'AS-STRG-P))
+		      "[^\000]*?\n#\\+end_src\\)")))
 	 (first-block-p t))
+
     ;; 1st run: outcomment text, delete (active) block delimiters
     ;; reset (left-over) marker
     (move-marker outorg-beginning-of-code nil)
     (move-marker outorg-end-of-code nil)
+
     ;; 1st run: outcomment text
     (goto-char (point-min))
-    (while (re-search-forward rgxp nil 'NOERROR)
+    (while (re-search-forward regexp nil 'NOERROR)
       ;; special case 1st block
       (if first-block-p
           (progn
@@ -1455,16 +1454,13 @@ Assume that edit-buffer major-mode has been set back to the
                   (comment-region (point-min) (match-beginning 0)))))
 	    (setq first-block-p nil))
 	;; default case
-        (let ((previous-beg-src
-	       (marker-position outorg-beginning-of-code))
-	      (previous-end-src
-	       (marker-position outorg-end-of-code)))
+        (let ((previous-beg-src (marker-position outorg-beginning-of-code))
+	      (previous-end-src (marker-position outorg-end-of-code)))
 	  (move-marker outorg-beginning-of-code (match-beginning 0))
 	  (move-marker outorg-end-of-code (match-end 0))
 	  (save-match-data
 	    (ignore-errors
-	      (comment-region previous-end-src
-			      (match-beginning 0))))
+	      (comment-region previous-end-src (match-beginning 0))))
 	  (save-excursion
 	    (goto-char previous-end-src)
 	    (delete-region (1- (point-at-bol)) (point-at-eol))
@@ -1474,9 +1470,10 @@ Assume that edit-buffer major-mode has been set back to the
               (delete-region (1- (point-at-bol)) (point-at-eol)))))))
     ;; special case last block
     (ignore-errors
-      (comment-region
-       (if first-block-p (point-min) outorg-end-of-code)
-       (point-max)))
+      (comment-region (if first-block-p
+                          (point-min)
+                        outorg-end-of-code)
+                      (point-max)))
     (unless first-block-p		; no src-block so far
       (save-excursion
 	(goto-char outorg-end-of-code)
@@ -1489,13 +1486,9 @@ Assume that edit-buffer major-mode has been set back to the
   (when outorg-oldschool-elisp-headers-p
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward
-	      "\\(^;;\\)\\( [*]+\\)\\( \\)"
-	      nil 'NOERROR)
-	(let* ((org-header-level
-		(- (length (match-string-no-properties 0)) 4))
-	       (replacement-string
-		(let ((strg ";"))
+      (while (re-search-forward "\\(^;;\\)\\( [*]+\\)\\( \\)" nil 'NOERROR)
+	(let* ((org-header-level (- (length (match-string-no-properties 0)) 4))
+	       (replacement-string (let ((strg ";"))
 		  (dotimes (i (1- org-header-level) strg)
 		    (setq strg (concat strg ";"))))))
           (replace-match replacement-string nil nil nil 2))))))
