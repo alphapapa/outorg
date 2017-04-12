@@ -1226,6 +1226,7 @@ block."
     ;; begin of block
     (goto-char outorg-beginning-of-code)
     (newline)
+    (newline)  ; Insert blank line between text and block
     (forward-line -1)
     (insert
      (if EXAMPLE-BLOCK-P
@@ -1447,20 +1448,40 @@ before this function is called."
             ;; Handle first block
             (move-marker outorg-beginning-of-code (match-beginning 0))
 	    (move-marker outorg-end-of-code (match-end 0))
+
+            ;; Delete blank line above block
+            (save-excursion
+              (goto-char outorg-beginning-of-code)
+              (delete-region (save-excursion
+                               (save-match-data
+                                 (re-search-backward (rx not-newline))
+                                 (line-end-position)))
+                             (1- (point))))
+
             (if (eq (point-min) (match-beginning 0))
                 (goto-char (match-end 0))
               (save-match-data
                 (ignore-errors
-                  (comment-region (point-min) (match-beginning 0)))))
+                  (comment-region (point-min) (marker-position outorg-beginning-of-code)))))
 	    (setq first-block-p nil))
 	;; default case
         (let ((previous-beg-src (marker-position outorg-beginning-of-code))
 	      (previous-end-src (marker-position outorg-end-of-code)))
 	  (move-marker outorg-beginning-of-code (match-beginning 0))
 	  (move-marker outorg-end-of-code (match-end 0))
+
+          ;; Delete blank line above block
+          (save-excursion
+            (goto-char outorg-beginning-of-code)
+            (delete-region (save-excursion
+                             (save-match-data
+                               (re-search-backward (rx not-newline))
+                               (line-end-position)))
+                           (1- (point))))
+
 	  (save-match-data
 	    (ignore-errors
-	      (comment-region previous-end-src (match-beginning 0))))
+	      (comment-region previous-end-src (marker-position outorg-beginning-of-code))))
 	  (save-excursion
 	    (goto-char previous-end-src)
 	    (delete-region (1- (point-at-bol)) (point-at-eol))
