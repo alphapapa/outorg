@@ -1,6 +1,4 @@
--
-
-* outorg
+* outorg                                                           :noexport:
 
 Outorg is for editing comment-sections of source-code files in temporary Org-mode buffers. It turns conventional literate-programming upside-down in that the default mode is the programming-mode, and special action has to be taken to switch to the text-mode (i.e. Org-mode).
 
@@ -8,32 +6,30 @@ Outorg depends on Outshine, i.e. outline-minor-mode with outshine extensions act
 
 Thus org-mode and programming-mode are just two different views on the outshine-style structured source-file, and outorg is the tool to switch between these two views. When switching from a programming-mode to org-mode, the comments are converted to text and the source-code is put into src-blocks. When switching back from org-mode to the programming-mode, the process is reversed - the text is outcommented again and the src-blocks that enclose the source-code are removed.
 
-When the code is more important than the text, i.e. when the task is rather 'literate PROGRAMMING' than 'LITERATE programming', it is often more convenient to work in a programming-mode and switch to org-mode once in a while than vice-versa. Outorg is really fast, even big files with 10k lines are converted in a second or so, and the user decides if he wants to convert just the current subtree (done instantly) or the whole buffer. Since text needs no session handling or variable passing or other special treatment, the outorg approach is much simpler than the Org-Babel approach. However, the full power of Org-Babel is available once the *outorg-edit-buffer* has popped up.
+When the code is more important than the text, i.e. when the task is "literate /programming/" rather than "/literate/ programming," it is often more convenient to work in a programming-mode and switch to org-mode once in a while than vice-versa. Outorg is really fast, even big files with 10k lines are converted in a second or so, and the user decides if he wants to convert just the current subtree (done instantly) or the whole buffer. Since text needs no session handling or variable passing or other special treatment, the outorg approach is much simpler than the Org-Babel approach. However, the full power of Org-Babel is available once the *outorg-edit-buffer* has popped up.
 
-** Contents                                                            :TOC:
- - [[#outorg][outorg]]
-     - [[#installation][Installation]]
-     - [[#usage][Usage]]
-     - [[#bugs-and-shortcomings][Bugs and Shortcomings]]
-     - [[#tests][Tests]]
-     - [[#changelog][Changelog]]
+* Contents                                                              :TOC:
+ - [[#installation][Installation]]
+ - [[#usage][Usage]]
+ - [[#changelog][Changelog]]
+ - [[#bugs-and-shortcomings][Bugs and Shortcomings]]
 
-** Installation                                                 :noexport_1:
+* Installation                                                   :noexport_1:
 
-*** MELPA
+** MELPA
 
 If you install from MELPA, you're done.
 
-*** Manual
+** Manual
 
 First install [[https://github.com/alphapapa/outshine][Outshine]], then =(require 'outorg)= in your init file.
 
-** Usage
+* Usage
 
-Outorg assumes that you set =outline-minor-mode-prefix= in your init-file to 'M-#':
+Outorg assumes that you set =outline-minor-mode-prefix= in your init-file to =M-#=, like this:
 
 #+BEGIN_SRC elisp
-    ;; must be set before outline is loaded
+    ;; Must be set before outline is loaded
     (defvar outline-minor-mode-prefix "\M-#")
 #+END_SRC
 
@@ -44,11 +40,32 @@ Outorg's main command is =outorg-edit-as-org= (by default, bound to =M-# #=), to
 
 If you want to insert Org-mode source-code or example blocks in comment-sections, i.e. you don't want outorg to remove the enclosing blocks, simply outcomment them in the outorg-edit buffer before calling =outorg-copy-edits-and-exit=.
 
-** Bugs and Shortcomings
+* Changelog                                                      :noexport_1:
+
+** 2.1-pre
+
+*Additions*:
++  Convert readme to Org.
++  Display blank lines between code blocks and regular text when editing.
++  Use =SRC= blocks more often (i.e. when the source buffer has a major mode).
+
+*Fixes:*
++  Use =setq-local= instead of =org-set-local=
++  Verify =outline-minor-mode= is active before trying to edit.
+
+** Pre-2.1 changelog
+
+  | date              | author(s)         | version   |
+  |-------------------+-------------------+-----------|
+  | <2014-09-20 Sa>   | Thorsten Jolitz   | 2.0       |
+  | <2013-05-03 Fr>   | Thorsten Jolitz   | 1.0       |
+  | <2013-02-11 Mo>   | Thorsten Jolitz   | 0.9       |
+
+* Bugs and Shortcomings
 
 Outorg started out purely line-based, it only worked with one-line comments, i.e. with comment-sections like those produced by =comment-region= (a command that comments or uncomments each line in the region). It was enhanced later on to recognize comment regions too, i.e. those special multi-line comments found in many programming languages.  But using outorg on such multi-line comments will probably change their syntax back to single-line whenever =comment-region= uses this style.
 
-** Tests
+* Tests                                                            :noexport:
 
 *Note:* The tests are currently non-functional.  They should be updated using =assess= rather than =ert-buffer=.
 
@@ -67,24 +84,3 @@ A special kind of test has been developed for outorg using the =ert-buffer= libr
 6. org-mode -> programming-mode (again)
 
 After these 4 conversions, the original programming-mode buffer must be unchanged when the conversion process is perfect, i.e. does not introduce any changes itself. See =outorg-test.el= for details.
-
-** Changelog
-
-*** 2.1-pre
-
-*Additions*:
-+  Convert readme to Org.
-+  Display blank lines between code blocks and regular text when editing.
-+  Use =SRC= blocks more often (i.e. when the source buffer has a major mode).
-
-*Fixes:*
-+  Use =setq-local= instead of =org-set-local=
-+  Verify =outline-minor-mode= is active before trying to edit.
-
-*** Pre-2.1 changelog
-
-  | date              | author(s)         | version   |
-  |-------------------+-------------------+-----------|
-  | <2014-09-20 Sa>   | Thorsten Jolitz   | 2.0       |
-  | <2013-05-03 Fr>   | Thorsten Jolitz   | 1.0       |
-  | <2013-02-11 Mo>   | Thorsten Jolitz   | 0.9       |
