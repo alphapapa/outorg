@@ -1131,76 +1131,87 @@ In `emacs-lisp-mode', transform one oldschool header (only semicolons) into an o
       (replace-match replacement-string))))
 
 (defun outorg-copy-and-convert ()
-  "Copy code buffer content to tmp-buffer and convert it to Org syntax.
-If `outorg-edit-whole-buffer' is non-nil, copy the whole buffer, otherwise
-  the current subtree."
+  "Copy code buffer content to temp buffer and convert it to Org syntax.
+If `outorg-edit-whole-buffer' is non-nil, copy the whole buffer,
+otherwise the current subtree."
+
   (when (buffer-live-p (get-buffer outorg-edit-buffer-name))
-    (if (y-or-n-p
-	 (format "%s exists - save and overwrite contents "
-		 outorg-edit-buffer-name))
+    (if (y-or-n-p (format "%s exists - save and overwrite contents " outorg-edit-buffer-name))
 	(with-current-buffer outorg-edit-buffer-name
 	  (outorg-save-edits-to-tmp-file))
       (user-error "Edit as Org cancelled.")))
-  (let* ((edit-buffer
-          (get-buffer-create outorg-edit-buffer-name)))
+
+  (let* ((edit-buffer (get-buffer-create outorg-edit-buffer-name)))
     (save-restriction
+
+      ;; Erase edit-buffer
       (with-current-buffer edit-buffer
         (erase-buffer))
-      ;; copy code buffer content
-      (copy-to-buffer
-       edit-buffer
-       (if outorg-edit-whole-buffer-p
-           (point-min)
-         (save-excursion
-           (outline-back-to-heading 'INVISIBLE-OK)
-           (point)))
-       (if outorg-edit-whole-buffer-p
-           (point-max)
-         (save-excursion
-           (outline-end-of-subtree)
-           (point)))))
-    ;; switch to edit buffer
-    (if (one-window-p) (split-window-sensibly (get-buffer-window)))
+
+      ;; Copy code buffer content
+      (copy-to-buffer edit-buffer
+                      (if outorg-edit-whole-buffer-p
+                          (point-min)
+                        (save-excursion
+                          (outline-back-to-heading 'INVISIBLE-OK)
+                          (point)))
+                      (if outorg-edit-whole-buffer-p
+                          (point-max)
+                        (save-excursion
+                          (outline-end-of-subtree)
+                          (point)))))
+
+    ;; Switch to edit buffer
+    (when (one-window-p)
+      (split-window-sensibly (get-buffer-window)))
     (switch-to-buffer-other-window edit-buffer)
-    ;; reinstall outorg-markers
+
+    ;; Reinstall outorg-markers
     (outorg-reinstall-markers-in-region (point-min))
-    ;; set point
+
+    ;; Set point
     (goto-char outorg-edit-buffer-point-marker)
-    ;; activate programming language major mode and convert to org
-    (let ((mode (outorg-get-buffer-mode
-                 (marker-buffer outorg-code-buffer-point-marker))))
-      ;; special case R-mode
+
+    ;; Activate programming language major mode and convert to org
+    (let ((mode (outorg-get-buffer-mode (marker-buffer outorg-code-buffer-point-marker))))
+      ;; Special case R-mode
       (if (eq mode 'ess-mode)
           (funcall 'R-mode)
         (funcall mode)))
-    ;; convert oldschool elisp headers to outshine headers
+
+    ;; Convert oldschool elisp headers to outshine headers
     (when outorg-oldschool-elisp-headers-p
       (outorg-convert-oldschool-elisp-buffer-to-outshine)
-      ;; reset var to original state after conversion
+      ;; Reset var to original state after conversion
       (setq outorg-oldschool-elisp-headers-p t))
-    ;; call conversion function
+
+    ;; Call conversion function
     (outorg-convert-to-org)
-    ;; change major mode to org-mode
+
+    ;; Change major mode to org-mode
     (org-mode)
-    ;; activate minor mode outorg-edit-minor-mode
+
+    ;; Activate minor mode outorg-edit-minor-mode
     (outorg-edit-minor-mode)
-    ;; set outline visibility
+
+    ;; Set outline visibility
     (if (not outorg-edit-whole-buffer-p)
         (show-all)
       (hide-sublevels 3)
       (ignore-errors (show-subtree))
-      ;; insert export template
-      (cond
-       (outorg-ask-user-for-export-template-file-p
-        (call-interactively
-         'outorg-insert-export-template-file))
-       (outorg-insert-default-export-template-p
-        (outorg-insert-default-export-template))))
-    ;; update md5 for watchdoc
+
+      ;; Insert export template
+      (cond (outorg-ask-user-for-export-template-file-p
+             (call-interactively 'outorg-insert-export-template-file))
+            (outorg-insert-default-export-template-p
+             (outorg-insert-default-export-template))))
+
+    ;; Update md5 for watchdoc
     (when (and outorg-propagate-changes-p
 	       (require 'org-watchdoc nil t))
       (org-watchdoc-set-md5))
-    ;; reset buffer-undo-list
+
+    ;; Reset buffer-undo-list
     (setq buffer-undo-list nil)))
 
 (defun outorg-wrap-source-in-block (lang &optional EXAMPLE-BLOCK-P)
