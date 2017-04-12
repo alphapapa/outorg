@@ -1216,31 +1216,27 @@ otherwise the current subtree."
     ;; Reset buffer-undo-list
     (setq buffer-undo-list nil)))
 
-(defun outorg-wrap-source-in-block (lang &optional EXAMPLE-BLOCK-P)
+(defun outorg-wrap-source-in-block (lang &optional example-block-p)
   "Wrap code between in src-block of LANG.
 If EXAMPLE-BLOCK-P is non-nil, use an example-block instead of a
 source-block. Use `outorg-beginning-of-code' and
-`outorg-end-of-code' to find start and end position of
-block."
+`outorg-end-of-code' to find start and end position of block."
   (save-excursion
-    ;; begin of block
+    ;; Begin of block
     (goto-char outorg-beginning-of-code)
     (newline)
     (newline)  ; Insert blank line between text and block
     (forward-line -1)
-    (insert
-     (if EXAMPLE-BLOCK-P
-	 "#+begin_example"
-       (format "#+begin_src %s" lang)))
+    (insert (if example-block-p
+                "#+begin_example"
+              (format "#+begin_src %s" lang)))
     (move-marker outorg-beginning-of-code (point-at-bol))
-    ;; end of block
+    ;; End of block
     (goto-char outorg-end-of-code)
     (newline)
-    ;; (forward-line -1)
-    (insert
-     (if EXAMPLE-BLOCK-P
-	 "#+end_example"
-       "#+end_src"))))
+    (insert (if example-block-p
+                "#+end_example"
+              "#+end_src"))))
 
 ;; We treat nestable comments as code. This is the fourth field of the
 ;; parser state vector: it is `t' if in a non-nestable comment, or the
