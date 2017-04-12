@@ -470,24 +470,26 @@ of a symbol."
     (with-current-buffer buf
       (if as-strg-p (symbol-name major-mode) major-mode))))
 
-(defun outorg-get-babel-name (&optional mode-name as-strg-p)
+(defun outorg-get-babel-name (&optional mode-name as-string)
   "Return the symbol associated in Org-Babel with MODE-NAME.
 
 Uses `outorg-language-name-assocs' as association list between
 the string returned by `major-mode' in the associated source-code
 buffer and the symbol used for that language in
-`org-babel-load-languages'. If AS-STRG-P is non-nil, a string
-is returned."
-  (let* ((mmode (or
-		 (and mode-name
-		      (cond
-		       ((stringp mode-name) (intern mode-name))
-		       ((symbolp mode-name) mode-name)
-		       (t (error
-			   "Mode-Name neither String nor Symbol"))))
+`org-babel-load-languages'. If AS-STRING is non-nil, a string is
+returned."
+  (let* ((mmode (if mode-name
+                    (cond
+                     ((stringp mode-name) (intern mode-name))
+                     ((symbolp mode-name) mode-name)
+                     (t (error "Mode-Name neither String nor Symbol")))
 		 major-mode))
-         (bname (cdr (assoc mmode outorg-language-name-assocs))))
-    (if as-strg-p (symbol-name bname) bname)))
+         (bname (or (cdr (assoc mmode outorg-language-name-assocs))
+                    ;; Not found in alist; just use major-mode name without "-mode" suffix
+                    (intern (replace-regexp-in-string "-mode$" "" (symbol-name mmode))))))
+    (if as-string
+        (symbol-name bname)
+      bname)))
 
 (defun outorg-get-mode-name (babel-name &optional as-strg-p)
   "Return the major-mode name associated with BABEL-NAME.
