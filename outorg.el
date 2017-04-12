@@ -734,16 +734,16 @@ Finally add one newline."
                          ((eq (current-buffer) (marker-buffer outorg-edit-buffer-point-marker))
                           "outorg-edit-buffer-")
                          (t (error "This should not happen"))))
-	   (markers (mapcar (lambda (--marker)
+	   (markers (mapcar (lambda (marker)
                               (intern (format "%s%s"
                                               (if (string-match "\\(org\\|mark\\)"
-                                                                (car (split-string (symbol-name --marker) "-" t)))
+                                                                (car (split-string (symbol-name marker) "-" t)))
                                                   ""
                                                 prefix)
-                                              --marker)))
+                                              marker)))
                             markers)))
-      (mapc (lambda (--marker)
-              (outorg-check-and-save-marker --marker beg end))
+      (mapc (lambda (marker)
+              (outorg-check-and-save-marker marker beg end))
             markers))))
 
 ;; adapted from org.el
