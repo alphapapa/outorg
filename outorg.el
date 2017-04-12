@@ -1272,108 +1272,96 @@ space."
 
 (defun outorg-convert-to-org ()
   "Convert buffer content to Org Syntax"
-  (let* ((buffer-mode
-	  (outorg-get-buffer-mode
-	   (marker-buffer outorg-code-buffer-point-marker)))
+  (let* ((buffer-mode (outorg-get-buffer-mode (marker-buffer outorg-code-buffer-point-marker)))
 	 (babel-lang (outorg-get-babel-name buffer-mode))
-	 (example-block-p
-	  (not
-	   (outorg-in-babel-load-languages-p buffer-mode))))
+	 (example-block-p (not (outorg-in-babel-load-languages-p buffer-mode))))
 
     (outorg-remove-trailing-blank-lines)
-    ;; reset (left-over) markers
+
+    ;; Reset (left-over) markers
     (move-marker outorg-pt-A-marker nil)
     (move-marker outorg-pt-B-marker nil)
     (move-marker outorg-pt-C-marker nil)
-    ;; special case beginning of buffer
+
     (save-excursion
       (goto-char (point-min))
-      ;; buffer begins with code
       (unless (outorg-comment-on-line-p)
-	;; mark beginning of code
-	(move-marker outorg-pt-B-marker
-		     (progn
-                       (forward-line-comments)
-		       (point))))
-      ;; loop over rest of buffer
+        ;; Special case beginning of buffer
+        ;; Buffer begins with code
+        ;; Mark beginning of code
+	(move-marker outorg-pt-B-marker (progn
+                                          (forward-line-comments)
+                                          (point))))
       (while (and (< (point) (point-max))
-                  ;; mark beginning of comment
-		  (marker-position
-		   (move-marker outorg-pt-A-marker
-                                (outorg-comment-search-forward))))
+		  (marker-position (move-marker outorg-pt-A-marker (outorg-comment-search-forward)))) ; Mark beginning of comment
+        ;; Loop over rest of buffer
 	(goto-char outorg-pt-A-marker)
-	;; comment does not start at BOL -> skip
-	;; looking at src-block delimiter -> skip
-	(if (or (not (eq (marker-position outorg-pt-A-marker)
-			 (point-at-bol)))
+	(if (or (not
+                 ;; Comment does not start at BOL -> skip
+                 (eq (marker-position outorg-pt-A-marker)
+                     (point-at-bol)))
+                ;; Looking at src-block delimiter -> skip
 		(looking-at "^#\\+begin_")
 		(looking-at "^#\\+end_"))
 	    (forward-line)
-	  ;; comments starts at BOL -> convert
+
+	  ;; Comments starts at BOL -> convert
 	  (if (marker-position outorg-pt-B-marker)
-	      ;; special case buffer begins with code
-              (move-marker outorg-pt-C-marker
-                           (progn
-                             (beginning-of-line)
-                             (backward-line-comments)
-                             (point)))
-	    ;; default case buffer begins with comments
-	    ;; mark beginning of code
-	    (move-marker outorg-pt-B-marker
-			 ;; skip forward comments and whitespace
-			 (progn
-                           (forward-line-comments)
-			   (point)))
-	    ;; mark end of code
-	    (move-marker outorg-pt-C-marker
-			 ;; search next comment (starting at bol)
-			 (progn
-                           (forward-line)
-                           (outorg-comment-search-forward)
-			   ;; move point to beg of comment
-			   (beginning-of-line)
-			   (unless (bobp)
-			     ;; skip backward comments and whitespace
-                             (backward-line-comments)
-			     ;; deal with trailing comment on line
-			     (unless (bobp)
-			       (end-of-line)))
-                           (point)))))
-        ;; wrap code between B and C in block
+	      ;; Special case buffer begins with code
+              (move-marker outorg-pt-C-marker (progn
+                                                (beginning-of-line)
+                                                (backward-line-comments)
+                                                (point)))
+	    ;; Default case buffer begins with comments
+	    ;; Mark beginning of code
+	    (move-marker outorg-pt-B-marker (progn
+                                              ;; Skip forward comments and whitespace
+                                              (forward-line-comments)
+                                              (point)))
+	    ;; Mark end of code
+	    (move-marker outorg-pt-C-marker (progn
+                                              ;; Search next comment (starting at bol)
+                                              (forward-line)
+                                              (outorg-comment-search-forward)
+                                              ;; Move point to beg of comment
+                                              (beginning-of-line)
+                                              (unless (bobp)
+                                                ;; Skip backward comments and whitespace
+                                                (backward-line-comments)
+                                                (unless (bobp)
+                                                  ;; Deal with trailing comment on line
+                                                  (end-of-line)))
+                                              (point)))))
+        ;; Wrap code between B and C in block
         (when (< outorg-pt-B-marker outorg-pt-C-marker)
-          (outorg-wrap-source-in-block
-           babel-lang example-block-p))
-        ;; remember marker positions
-        (let ((pt-A-pos		; beg-of-comment
-               (marker-position outorg-pt-A-marker))
-              (pt-B-pos		; beg-of-code
-               (marker-position outorg-pt-B-marker))
-              (pt-C-pos		; end-of-code
-               (marker-position outorg-pt-C-marker)))
-          ;; special case only comments and whitespace in buffer
+          (outorg-wrap-source-in-block babel-lang example-block-p))
+        ;; Remember marker positions
+        (let ((pt-A-pos (marker-position outorg-pt-A-marker)) ; beg-of-comment
+              (pt-B-pos (marker-position outorg-pt-B-marker)) ; beg-of-code
+              (pt-C-pos (marker-position outorg-pt-C-marker))) ; end-of-code
+
           (when (and (eq pt-A-pos 1)
                      (eq pt-B-pos 1))
-            ;; mark whole buffer
+            ;; Special case only comments and whitespace in buffer
+            ;; Mark whole buffer
             (move-marker outorg-pt-B-marker (point-max)))
-          ;; uncomment region between A and B
-          (when (< outorg-pt-A-marker
-                   outorg-pt-B-marker)
-            (uncomment-region
-             outorg-pt-A-marker outorg-pt-B-marker)
-            ;; move point to end of src
+          (when (< outorg-pt-A-marker outorg-pt-B-marker)
+            ;; Uncomment region between A and B
+            (uncomment-region outorg-pt-A-marker outorg-pt-B-marker)
+            ;; Move point to end of src
             (and pt-B-pos pt-C-pos
-                 (cond
-                  ;; special case only comments and whitespace in
-                  ;; buffer -> finish loop
-                  ((eq (marker-position outorg-pt-B-marker)
-                       (point-max))
-                   (goto-char outorg-pt-B-marker))
-                  ;; loop until C is at EOB
-                  ((< pt-B-pos pt-C-pos)
-                   (goto-char outorg-pt-C-marker))
-                  (t "This should not happen"))))
-          (when (< pt-C-pos pt-B-pos) (goto-char (point-max))))
-        ;; reset markers
+                 (cond ((eq (marker-position outorg-pt-B-marker)
+                            (point-max))
+                        ;; Special case only comments and whitespace in buffer -> finish loop
+                        (goto-char outorg-pt-B-marker))
+                       ((< pt-B-pos pt-C-pos)
+                        ;; Loop until C is at EOB
+                        (goto-char outorg-pt-C-marker))
+                       (t "This should not happen"))))
+          (when (< pt-C-pos pt-B-pos)
+            (goto-char (point-max))))
+
+        ;; Reset markers
         (move-marker outorg-pt-B-marker nil)
         (move-marker outorg-pt-C-marker nil)
         (move-marker outorg-pt-A-marker nil)))))
