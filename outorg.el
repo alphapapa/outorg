@@ -1305,21 +1305,21 @@ space."
 		(looking-at "^#\\+end_"))
 	    (forward-line)
 
-	  ;; Comments starts at BOL -> convert
-	  (if (marker-position outorg-beginning-of-code)
-	      ;; Special case buffer begins with code
+          ;; Comments starts at BOL -> convert
+          (if (marker-position outorg-beginning-of-code)
+              ;; Special case buffer begins with code
               (move-marker outorg-end-of-code (progn
                                                 (beginning-of-line)
                                                 (backward-line-comments)
                                                 (point)))
-	    ;; Default case buffer begins with comments
-	    ;; Mark beginning of code
-	    (move-marker outorg-beginning-of-code (progn
+            ;; Default case buffer begins with comments
+            ;; Mark beginning of code
+            (move-marker outorg-beginning-of-code (progn
                                                     ;; Skip forward comments and whitespace
                                                     (forward-line-comments)
                                                     (point)))
-	    ;; Mark end of code
-	    (move-marker outorg-end-of-code (progn
+            ;; Mark end of code
+            (move-marker outorg-end-of-code (progn
                                               ;; Search next comment (starting at bol)
                                               (forward-line)
                                               (outorg-comment-search-forward)
@@ -1331,42 +1331,42 @@ space."
                                                 (unless (bobp)
                                                   ;; Deal with trailing comment on line
                                                   (end-of-line)))
-                                              (point)))))
-        ;; Wrap code between B and C in block
-        (when (< outorg-beginning-of-code outorg-end-of-code)
-          (outorg-wrap-source-in-block babel-lang example-block-p))
+                                              (point))))
+          ;; Wrap code between B and C in block
+          (when (< outorg-beginning-of-code outorg-end-of-code)
+            (outorg-wrap-source-in-block babel-lang example-block-p))
 
-        ;; Remember marker positions
-        (let ((pt-A-pos (marker-position outorg-beginning-of-comment)) ; beg-of-comment
-              (pt-B-pos (marker-position outorg-beginning-of-code)) ; beg-of-code
-              (pt-C-pos (marker-position outorg-end-of-code))) ; end-of-code
+          ;; Remember marker positions
+          (let ((pt-A-pos (marker-position outorg-beginning-of-comment)) ; beg-of-comment
+                (pt-B-pos (marker-position outorg-beginning-of-code)) ; beg-of-code
+                (pt-C-pos (marker-position outorg-end-of-code))) ; end-of-code
 
-          (when (and (eq pt-A-pos 1)
-                     (eq pt-B-pos 1))
-            ;; Special case only comments and whitespace in buffer
-            ;; Mark whole buffer
-            (move-marker outorg-beginning-of-code (point-max)))
+            (when (and (eq pt-A-pos 1)
+                       (eq pt-B-pos 1))
+              ;; Special case only comments and whitespace in buffer
+              ;; Mark whole buffer
+              (move-marker outorg-beginning-of-code (point-max)))
 
-          (when (< outorg-beginning-of-comment outorg-beginning-of-code)
-            ;; Uncomment region between A and B
-            (uncomment-region outorg-beginning-of-comment outorg-beginning-of-code)
-            ;; Move point to end of src
-            (and pt-B-pos pt-C-pos
-                 (cond ((eq (marker-position outorg-beginning-of-code)
-                            (point-max))
-                        ;; Special case only comments and whitespace in buffer -> finish loop
-                        (goto-char outorg-beginning-of-code))
-                       ((< pt-B-pos pt-C-pos)
-                        ;; Loop until C is at EOB
-                        (goto-char outorg-end-of-code))
-                       (t "This should not happen"))))
-          (when (< pt-C-pos pt-B-pos)
-            (goto-char (point-max))))
+            (when (< outorg-beginning-of-comment outorg-beginning-of-code)
+              ;; Uncomment region between A and B
+              (uncomment-region outorg-beginning-of-comment outorg-beginning-of-code)
+              ;; Move point to end of src
+              (and pt-B-pos pt-C-pos
+                   (cond ((eq (marker-position outorg-beginning-of-code)
+                              (point-max))
+                          ;; Special case only comments and whitespace in buffer -> finish loop
+                          (goto-char outorg-beginning-of-code))
+                         ((< pt-B-pos pt-C-pos)
+                          ;; Loop until C is at EOB
+                          (goto-char outorg-end-of-code))
+                         (t "This should not happen"))))
+            (when (< pt-C-pos pt-B-pos)
+              (goto-char (point-max))))
 
-        ;; Reset markers
-        (move-marker outorg-beginning-of-code nil)
-        (move-marker outorg-end-of-code nil)
-        (move-marker outorg-beginning-of-comment nil)))))
+          ;; Reset markers
+          (move-marker outorg-beginning-of-code nil)
+          (move-marker outorg-end-of-code nil)
+          (move-marker outorg-beginning-of-comment nil))))))
 
 (defun outorg-indent-active-source-blocks (mode-name)
   "Indent active source-blocks after conversion to Org.
