@@ -578,7 +578,7 @@ If MODE-NAME is nil, check if Org-Babel identifier of major-mode of current buff
     
     ;; (setq buffer-offer-save t)
     (and outorg-edit-buffer-persistent-message
-         (org-set-local 'header-line-format msg))
+         (setq-local header-line-format msg))
     ;; (setq buffer-file-name
     ;;       (concat (buffer-file-name
     ;; (marker-buffer outorg-code-buffer-point-marker))
