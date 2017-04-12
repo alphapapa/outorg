@@ -347,18 +347,18 @@ the start of the region.")
 (defvar outorg-org-finish-function-called-p nil
   "Non-nil if `org-finish-function' was called, nil otherwise.")
 
-(defvar outorg-pt-A-marker (make-marker)
-  "Outorg marker for tracking begin of comment.
+(defvar outorg-beginning-of-comment (make-marker)
+  "Marker for tracking beginning of comment.
 If pt-A < pt-B, the region between A and B is out- or
 uncommented.")
 
-(defvar outorg-pt-B-marker (make-marker)
-  "Outorg marker for tracking beginning of source-code.
+(defvar outorg-beginning-of-code (make-marker)
+  "Marker for tracking beginning of source code.
 If pt-B < pt-C, the region between B and C is wrapped/unwrapped
 as source-block.")
 
-(defvar outorg-pt-C-marker (make-marker)
-  "Outorg marker for tracking end of source-code.
+(defvar outorg-end-of-code (make-marker)
+  "Marker for tracking end of source code.
 If pt-B < pt-C, the region between B and C is wrapped/unwrapped
 as source-block.")
 
@@ -1217,21 +1217,21 @@ otherwise the current subtree."
 (defun outorg-wrap-source-in-block (lang &optional EXAMPLE-BLOCK-P)
   "Wrap code between in src-block of LANG.
 If EXAMPLE-BLOCK-P is non-nil, use an example-block instead of a
-source-block. Use `outorg-pt-B-marker' and
-`outorg-pt-C-marker' to find start and end position of
+source-block. Use `outorg-beginning-of-code' and
+`outorg-end-of-code' to find start and end position of
 block."
   (save-excursion
     ;; begin of block
-    (goto-char outorg-pt-B-marker)
+    (goto-char outorg-beginning-of-code)
     (newline)
     (forward-line -1)
     (insert
      (if EXAMPLE-BLOCK-P
 	 "#+begin_example"
        (format "#+begin_src %s" lang)))
-    (move-marker outorg-pt-B-marker (point-at-bol))
+    (move-marker outorg-beginning-of-code (point-at-bol))
     ;; end of block
-    (goto-char outorg-pt-C-marker)
+    (goto-char outorg-end-of-code)
     (newline)
     ;; (forward-line -1)
     (insert
@@ -1279,9 +1279,9 @@ space."
     (outorg-remove-trailing-blank-lines)
 
     ;; Reset (left-over) markers
-    (move-marker outorg-pt-A-marker nil)
-    (move-marker outorg-pt-B-marker nil)
-    (move-marker outorg-pt-C-marker nil)
+    (move-marker outorg-beginning-of-comment nil)
+    (move-marker outorg-beginning-of-code nil)
+    (move-marker outorg-end-of-code nil)
 
     (save-excursion
       (goto-char (point-min))
@@ -1289,16 +1289,16 @@ space."
         ;; Special case beginning of buffer
         ;; Buffer begins with code
         ;; Mark beginning of code
-	(move-marker outorg-pt-B-marker (progn
-                                          (forward-line-comments)
-                                          (point))))
+	(move-marker outorg-beginning-of-code (progn
+                                                (forward-line-comments)
+                                                (point))))
       (while (and (< (point) (point-max))
-		  (marker-position (move-marker outorg-pt-A-marker (outorg-comment-search-forward)))) ; Mark beginning of comment
+		  (marker-position (move-marker outorg-beginning-of-comment (outorg-comment-search-forward)))) ; Mark beginning of comment
         ;; Loop over rest of buffer
-	(goto-char outorg-pt-A-marker)
+	(goto-char outorg-beginning-of-comment)
 	(if (or (not
                  ;; Comment does not start at BOL -> skip
-                 (eq (marker-position outorg-pt-A-marker)
+                 (eq (marker-position outorg-beginning-of-comment)
                      (point-at-bol)))
                 ;; Looking at src-block delimiter -> skip
 		(looking-at "^#\\+begin_")
@@ -1306,20 +1306,20 @@ space."
 	    (forward-line)
 
 	  ;; Comments starts at BOL -> convert
-	  (if (marker-position outorg-pt-B-marker)
+	  (if (marker-position outorg-beginning-of-code)
 	      ;; Special case buffer begins with code
-              (move-marker outorg-pt-C-marker (progn
+              (move-marker outorg-end-of-code (progn
                                                 (beginning-of-line)
                                                 (backward-line-comments)
                                                 (point)))
 	    ;; Default case buffer begins with comments
 	    ;; Mark beginning of code
-	    (move-marker outorg-pt-B-marker (progn
-                                              ;; Skip forward comments and whitespace
-                                              (forward-line-comments)
-                                              (point)))
+	    (move-marker outorg-beginning-of-code (progn
+                                                    ;; Skip forward comments and whitespace
+                                                    (forward-line-comments)
+                                                    (point)))
 	    ;; Mark end of code
-	    (move-marker outorg-pt-C-marker (progn
+	    (move-marker outorg-end-of-code (progn
                                               ;; Search next comment (starting at bol)
                                               (forward-line)
                                               (outorg-comment-search-forward)
@@ -1333,38 +1333,40 @@ space."
                                                   (end-of-line)))
                                               (point)))))
         ;; Wrap code between B and C in block
-        (when (< outorg-pt-B-marker outorg-pt-C-marker)
+        (when (< outorg-beginning-of-code outorg-end-of-code)
           (outorg-wrap-source-in-block babel-lang example-block-p))
+
         ;; Remember marker positions
-        (let ((pt-A-pos (marker-position outorg-pt-A-marker)) ; beg-of-comment
-              (pt-B-pos (marker-position outorg-pt-B-marker)) ; beg-of-code
-              (pt-C-pos (marker-position outorg-pt-C-marker))) ; end-of-code
+        (let ((pt-A-pos (marker-position outorg-beginning-of-comment)) ; beg-of-comment
+              (pt-B-pos (marker-position outorg-beginning-of-code)) ; beg-of-code
+              (pt-C-pos (marker-position outorg-end-of-code))) ; end-of-code
 
           (when (and (eq pt-A-pos 1)
                      (eq pt-B-pos 1))
             ;; Special case only comments and whitespace in buffer
             ;; Mark whole buffer
-            (move-marker outorg-pt-B-marker (point-max)))
-          (when (< outorg-pt-A-marker outorg-pt-B-marker)
+            (move-marker outorg-beginning-of-code (point-max)))
+
+          (when (< outorg-beginning-of-comment outorg-beginning-of-code)
             ;; Uncomment region between A and B
-            (uncomment-region outorg-pt-A-marker outorg-pt-B-marker)
+            (uncomment-region outorg-beginning-of-comment outorg-beginning-of-code)
             ;; Move point to end of src
             (and pt-B-pos pt-C-pos
-                 (cond ((eq (marker-position outorg-pt-B-marker)
+                 (cond ((eq (marker-position outorg-beginning-of-code)
                             (point-max))
                         ;; Special case only comments and whitespace in buffer -> finish loop
-                        (goto-char outorg-pt-B-marker))
+                        (goto-char outorg-beginning-of-code))
                        ((< pt-B-pos pt-C-pos)
                         ;; Loop until C is at EOB
-                        (goto-char outorg-pt-C-marker))
+                        (goto-char outorg-end-of-code))
                        (t "This should not happen"))))
           (when (< pt-C-pos pt-B-pos)
             (goto-char (point-max))))
 
         ;; Reset markers
-        (move-marker outorg-pt-B-marker nil)
-        (move-marker outorg-pt-C-marker nil)
-        (move-marker outorg-pt-A-marker nil)))))
+        (move-marker outorg-beginning-of-code nil)
+        (move-marker outorg-end-of-code nil)
+        (move-marker outorg-beginning-of-comment nil)))))
 
 (defun outorg-indent-active-source-blocks (mode-name)
   "Indent active source-blocks after conversion to Org.
@@ -1433,8 +1435,8 @@ Assume that edit-buffer major-mode has been set back to the
 	 (first-block-p t))
     ;; 1st run: outcomment text, delete (active) block delimiters
     ;; reset (left-over) marker
-    (move-marker outorg-pt-B-marker nil)
-    (move-marker outorg-pt-C-marker nil)
+    (move-marker outorg-beginning-of-code nil)
+    (move-marker outorg-end-of-code nil)
     ;; 1st run: outcomment text
     (goto-char (point-min))
     (while (re-search-forward rgxp nil 'NOERROR)
@@ -1442,8 +1444,8 @@ Assume that edit-buffer major-mode has been set back to the
       (if first-block-p
           (progn
             ;; Handle first block
-	    (move-marker outorg-pt-B-marker (match-beginning 0))
-	    (move-marker outorg-pt-C-marker (match-end 0))
+	    (move-marker outorg-beginning-of-code (match-beginning 0))
+	    (move-marker outorg-end-of-code (match-end 0))
             (if (eq (point-min) (match-beginning 0))
                 (goto-char (match-end 0))
               (save-match-data
@@ -1452,11 +1454,11 @@ Assume that edit-buffer major-mode has been set back to the
 	    (setq first-block-p nil))
 	;; default case
         (let ((previous-beg-src
-	       (marker-position outorg-pt-B-marker))
+	       (marker-position outorg-beginning-of-code))
 	      (previous-end-src
-	       (marker-position outorg-pt-C-marker)))
-	  (move-marker outorg-pt-B-marker (match-beginning 0))
-	  (move-marker outorg-pt-C-marker (match-end 0))
+	       (marker-position outorg-end-of-code)))
+	  (move-marker outorg-beginning-of-code (match-beginning 0))
+	  (move-marker outorg-end-of-code (match-end 0))
 	  (save-match-data
 	    (ignore-errors
 	      (comment-region previous-end-src
@@ -1471,16 +1473,16 @@ Assume that edit-buffer major-mode has been set back to the
     ;; special case last block
     (ignore-errors
       (comment-region
-       (if first-block-p (point-min) outorg-pt-C-marker)
+       (if first-block-p (point-min) outorg-end-of-code)
        (point-max)))
     (unless first-block-p		; no src-block so far
       (save-excursion
-	(goto-char outorg-pt-C-marker)
+	(goto-char outorg-end-of-code)
 	(delete-region (1- (point-at-bol)) (point-at-eol))
-	(goto-char outorg-pt-B-marker)
+	(goto-char outorg-beginning-of-code)
 	(delete-region (1- (point-at-bol)) (point-at-eol)))))
-  (move-marker outorg-pt-B-marker nil)
-  (move-marker outorg-pt-C-marker nil)
+  (move-marker outorg-beginning-of-code nil)
+  (move-marker outorg-end-of-code nil)
   ;; 2nd (optional) run: convert elisp headers to oldschool
   (when outorg-oldschool-elisp-headers-p
     (save-excursion
