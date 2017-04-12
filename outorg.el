@@ -711,8 +711,8 @@ Finally add one newline."
 ;;  2. Deal with org markers set in the edit buffer and needed in
 ;;     after command hooks when edit buffer is already closed
 
-(defun outorg-save-markers (marker-lst)
-  "Save markers from MARKER-LST in `outorg-markers-to-move'."
+(defun outorg-save-markers (markers)
+  "Save MARKERS in `outorg-markers-to-move'."
   (save-restriction
     (widen)
     (let* ((beg (if (or outorg-edit-whole-buffer-p
@@ -754,7 +754,7 @@ Finally add one newline."
 			     ""
 			   prefix)
 			 --marker)))
-		     marker-lst)))
+		     markers)))
       (mapc
        (lambda (--marker)
 	 (outorg-check-and-save-marker --marker beg end))
