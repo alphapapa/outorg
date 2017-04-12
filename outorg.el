@@ -1,7 +1,7 @@
 ;;; outorg.el --- Org-style comment editing
 
 ;; Author: Adam Porter
-;; Version: 2.0
+;; Version: 2.1-pre
 ;; URL: https://github.com/alphapapa/outorg
 ;; Package-Requires: ((emacs "24.4"))
 
