@@ -72,9 +72,14 @@ After these 4 conversions, the original programming-mode buffer must be unchange
 
 *** 2.1-pre
 
+*Additions*:
 +  Convert readme to Org.
 +  Display blank lines between code blocks and regular text when editing.
 +  Use =SRC= blocks more often (i.e. when the source buffer has a major mode).
+
+*Fixes:*
++  Use =setq-local= instead of =org-set-local=
++  Verify =outline-minor-mode= is active before trying to edit.
 
 *** Pre-2.1 changelog
 
