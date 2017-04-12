@@ -716,8 +716,7 @@ Finally add one newline."
   (save-restriction
     (widen)
     (let* ((beg (if (or outorg-edit-whole-buffer-p
-			(equal (buffer-name)
-			       outorg-edit-buffer-name))
+			(equal (buffer-name) outorg-edit-buffer-name))
 		    (point-min)
 		  (if (outline-on-heading-p)
 		      (point)
@@ -725,40 +724,27 @@ Finally add one newline."
 		      (outline-previous-heading)
 		      (point)))))
 	   (end (if (or outorg-edit-whole-buffer-p
-			(equal (buffer-name)
-			       outorg-edit-buffer-name))
+			(equal (buffer-name) outorg-edit-buffer-name))
 		    (point-max)
 		  (save-excursion
 		    (outline-end-of-subtree)
 		    (point))))
-	   (prefix (cond
-		    ((eq (current-buffer)
-			 (marker-buffer
-			  outorg-code-buffer-point-marker))
-		     "outorg-code-buffer-")
-		    ((eq (current-buffer)
-			 (marker-buffer
-			  outorg-edit-buffer-point-marker))
-		     "outorg-edit-buffer-")
-		    (t (error "This should not happen"))))
-	   (markers (mapcar
-		     (lambda (--marker)
-		       (intern
-			(format
-			 "%s%s"
-			 (if (string-match
-			      "\\(org\\|mark\\)"
-			      (car (split-string
-				    (symbol-name --marker)
-				    "-" t)))
-			     ""
-			   prefix)
-			 --marker)))
-		     markers)))
-      (mapc
-       (lambda (--marker)
-	 (outorg-check-and-save-marker --marker beg end))
-       markers))))
+	   (prefix (cond ((eq (current-buffer) (marker-buffer outorg-code-buffer-point-marker))
+                          "outorg-code-buffer-")
+                         ((eq (current-buffer) (marker-buffer outorg-edit-buffer-point-marker))
+                          "outorg-edit-buffer-")
+                         (t (error "This should not happen"))))
+	   (markers (mapcar (lambda (--marker)
+                              (intern (format "%s%s"
+                                              (if (string-match "\\(org\\|mark\\)"
+                                                                (car (split-string (symbol-name --marker) "-" t)))
+                                                  ""
+                                                prefix)
+                                              --marker)))
+                            markers)))
+      (mapc (lambda (--marker)
+              (outorg-check-and-save-marker --marker beg end))
+            markers))))
 
 ;; adapted from org.el
 (defun outorg-check-and-save-marker (marker-or-var beg end)
