@@ -1224,8 +1224,12 @@ source-block. Use `outorg-beginning-of-code' and
   (save-excursion
     ;; Begin of block
     (goto-char outorg-beginning-of-code)
+
+    ;; Display blank line between text and block
+    (overlay-put (make-overlay (1- (point)) (1- (point)))
+                 'before-string "\n")
+
     (newline)
-    (newline)  ; Insert blank line between text and block
     (forward-line -1)
     (insert (if example-block-p
                 "#+begin_example"
@@ -1444,16 +1448,6 @@ before this function is called."
             ;; Handle first block
             (move-marker outorg-beginning-of-code (match-beginning 0))
 	    (move-marker outorg-end-of-code (match-end 0))
-
-            ;; Delete blank line above block
-            (save-excursion
-              (goto-char outorg-beginning-of-code)
-              (delete-region (save-excursion
-                               (save-match-data
-                                 (re-search-backward (rx not-newline))
-                                 (line-end-position)))
-                             (1- (point))))
-
             (if (eq (point-min) (match-beginning 0))
                 (goto-char (match-end 0))
               (save-match-data
@@ -1465,16 +1459,6 @@ before this function is called."
 	      (previous-end-src (marker-position outorg-end-of-code)))
 	  (move-marker outorg-beginning-of-code (match-beginning 0))
 	  (move-marker outorg-end-of-code (match-end 0))
-
-          ;; Delete blank line above block
-          (save-excursion
-            (goto-char outorg-beginning-of-code)
-            (delete-region (save-excursion
-                             (save-match-data
-                               (re-search-backward (rx not-newline))
-                               (line-end-position)))
-                           (1- (point))))
-
 	  (save-match-data
 	    (ignore-errors
 	      (comment-region previous-end-src (marker-position outorg-beginning-of-code))))
