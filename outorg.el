@@ -1073,31 +1073,31 @@ with picolisp-mode comment syntax. Finally, at the end of the
 buffer the '\(********\)' line is found again."
   (let ((final-line
          (concat "(" (regexp-quote "********") ")")))
-  (uncomment-region (point-min) (point-max))
-  (goto-char (point-min))
-  (re-search-forward (regexp-quote "#+DESCRIPTION: ") nil 'NOERROR)
-  (replace-match "")
-  (end-of-line)
-  (let ((show-trailing-whitespace nil))
-    (kill-line 2))
-  (insert "\"")
-  (re-search-forward final-line  nil 'NOERROR)
-  (beginning-of-line)
-  (re-search-backward "[[:alnum:][:punct:]]" nil 'NOERROR)
-  (forward-char)
-  (insert "\"")
-  (kill-line)
-  (save-excursion
-    (let ((pt (point)))
-      (goto-char (point-min))
-      (while (search-forward "^J" pt t)
-	(replace-match "\n" nil t))))
-  ;; (replace-string "\n" "^J" nil (point-min) (point))
-  (goto-char (point-min))
-  (when (looking-at
-         (concat "\\(^.*\\)"
-                 "\\(\"\\* <Header>\"\\)"
-                 "\\([\s\t\n]+" final-line "\\)"))
+    (uncomment-region (point-min) (point-max))
+    (goto-char (point-min))
+    (re-search-forward (regexp-quote "#+DESCRIPTION: ") nil 'NOERROR)
+    (replace-match "")
+    (end-of-line)
+    (let ((show-trailing-whitespace nil))
+      (kill-line 2))
+    (insert "\"")
+    (re-search-forward final-line  nil 'NOERROR)
+    (beginning-of-line)
+    (re-search-backward "[[:alnum:][:punct:]]" nil 'NOERROR)
+    (forward-char)
+    (insert "\"")
+    (kill-line)
+    (save-excursion
+      (let ((pt (point)))
+        (goto-char (point-min))
+        (while (search-forward "^J" pt t)
+          (replace-match "\n" nil t))))
+    ;; (replace-string "\n" "^J" nil (point-min) (point))
+    (goto-char (point-min))
+    (when (looking-at
+           (concat "\\(^.*\\)"
+                   "\\(\"\\* <Header>\"\\)"
+                   "\\([\s\t\n]+" final-line "\\)"))
       (replace-match (format "%s" "NIL") nil nil nil 2)
       ;; (kill-line)
       )))
@@ -1459,7 +1459,7 @@ before this function is called."
 	      (previous-end-src (marker-position outorg-end-of-code)))
 	  (move-marker outorg-beginning-of-code (match-beginning 0))
 	  (move-marker outorg-end-of-code (match-end 0))
-	  (save-match-data
+          (save-match-data
 	    (ignore-errors
 	      (comment-region previous-end-src (marker-position outorg-beginning-of-code))))
 	  (save-excursion
