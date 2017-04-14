@@ -13,6 +13,8 @@ When the code is more important than the text, i.e. when the task is "literate /
  - [[#usage][Usage]]
  - [[#changelog][Changelog]]
  - [[#bugs-and-shortcomings][Bugs and Shortcomings]]
+ - [[#credits][Credits]]
+ - [[#license][License]]
 
 * Installation                                                   :noexport_1:
 
@@ -64,6 +66,14 @@ If you want to insert Org-mode source-code or example blocks in comment-sections
 * Bugs and Shortcomings
 
 Outorg started out purely line-based, it only worked with one-line comments, i.e. with comment-sections like those produced by =comment-region= (a command that comments or uncomments each line in the region). It was enhanced later on to recognize comment regions too, i.e. those special multi-line comments found in many programming languages.  But using outorg on such multi-line comments will probably change their syntax back to single-line whenever =comment-region= uses this style.
+
+* Credits
+
+Outorg was originally written by [[https://github.com/tj64][Thorsten Jolitz]], who transferred maintainership to Adam Porter in April 2017.
+
+* License
+
+GPLv2 or later.
 
 * Tests                                                            :noexport:
 
