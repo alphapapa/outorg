@@ -1,6 +1,6 @@
 ;;; outorg-test.el --- ERT suite for outorg.el
 
-;; Author: Adam Porter
+;; Maintainer: Adam Porter
 ;; Version: 2.0
 ;; URL: https://github.com/alphapapa/outorg
 
@@ -12,7 +12,7 @@
 ;;   :licence:  GPL 2 or later (free software)
 ;;   :licence-url: http://www.gnu.org/licenses/
 ;;   :part-of-emacs: no
-;;   :author: Adam Porter
+;;   :maintainer: Adam Porter
 ;;   :inspiration:  test-org-element.el
 ;;   :keywords: emacs org-mode ert buffer
 ;;   :git-repo: https://github.com/alphapapa/outorg

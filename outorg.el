@@ -1,6 +1,6 @@
 ;;; outorg.el --- Org-style comment editing
 
-;; Author: Adam Porter
+;; Maintainer: Adam Porter
 ;; Version: 2.1-pre
 ;; URL: https://github.com/alphapapa/outorg
 ;; Package-Requires: ((emacs "24.4"))
@@ -13,7 +13,7 @@
 ;;   :licence:  GPL 2 or later (free software)
 ;;   :licence-url: http://www.gnu.org/licenses/
 ;;   :part-of-emacs: no
-;;   :author: Adam Porter
+;;   :maintainer: Adam Porter
 ;;   :inspiration:  org-src
 ;;   :keywords: emacs org-mode comment-editing
 ;;   :git-repo: https://github.com/alphapapa/outorg
