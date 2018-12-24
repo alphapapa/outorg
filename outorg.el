@@ -560,7 +560,7 @@ If MODE-NAME is nil, check if Org-Babel identifier of major-mode of current buff
                  (buffer-name
                   (marker-buffer outorg-code-buffer-point-marker))
                  " ] "
-                 "Exit with M-# (Meta-Key and #)")))
+                 (substitute-command-keys "Exit with \\[outorg-copy-edits-and-exit]"))))
 
     ;; Only run the kill-buffer-hooks when the outorg edit buffer is
     ;; being killed. This is because temporary buffers may be created

@@ -54,6 +54,7 @@ If you want to insert Org-mode source-code or example blocks in comment-sections
 *Fixes:*
 +  Use =setq-local= instead of =org-set-local=
 +  Verify =outline-minor-mode= is active before trying to edit.
++  Display the actual keybinding of =outorg-copy-edits-and-exit= in the header line of the edit buffer.
 
 ** Pre-2.1 changelog
 
