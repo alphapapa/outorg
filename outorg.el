@@ -1164,9 +1164,7 @@ otherwise the current subtree."
                           (point)))))
 
     ;; Switch to edit buffer
-    (when (one-window-p)
-      (split-window-sensibly (get-buffer-window)))
-    (switch-to-buffer-other-window edit-buffer)
+    (org-src-switch-to-buffer edit-buffer 'edit)
 
     ;; Reinstall outorg-markers
     (outorg-reinstall-markers-in-region (point-min))
