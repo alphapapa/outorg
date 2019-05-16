@@ -1114,7 +1114,7 @@ outcommented org-mode headers)."
     (while (not (eobp))
       (outline-next-heading)
       (outorg-convert-oldschool-elisp-headline-to-outshine)))
-  (funcall 'outshine-hook-function))
+  (outshine-mode 1))
 
 (defun outorg-convert-oldschool-elisp-headline-to-outshine ()
   "Transform oldschool headline to outshine.
