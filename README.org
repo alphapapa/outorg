@@ -2,7 +2,7 @@
 
 Outorg is for editing comment-sections of source-code files in temporary Org-mode buffers. It turns conventional literate-programming upside-down in that the default mode is the programming-mode, and special action has to be taken to switch to the text-mode (i.e. Org-mode).
 
-Outorg depends on Outshine, i.e. outline-minor-mode with outshine extensions activated. An outshine buffer is structured like an org-mode buffer, only with outcommented headlines. While in Org-mode text is text and source-code is 'hidden' inside of special src-blocks, in an outshine buffer source-code is source-code and text is 'hidden' as comments.
+Outorg works with Outshine, i.e. outline-minor-mode with outshine extensions activated. An outshine buffer is structured like an org-mode buffer, only with outcommented headlines. While in Org-mode text is text and source-code is 'hidden' inside of special src-blocks, in an outshine buffer source-code is source-code and text is 'hidden' as comments.
 
 Thus org-mode and programming-mode are just two different views on the outshine-style structured source-file, and outorg is the tool to switch between these two views. When switching from a programming-mode to org-mode, the comments are converted to text and the source-code is put into src-blocks. When switching back from org-mode to the programming-mode, the process is reversed - the text is outcommented again and the src-blocks that enclose the source-code are removed.
 
