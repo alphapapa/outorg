@@ -413,6 +413,11 @@ is removed before converting back from Org to source-code."
   :group 'outorg
   :type 'boolean)
 
+(defcustom outorg-ensure-blank-line nil
+  "Non-nil means insert an overlay between text and blocks.
+This overlay displays a blank line. It is inserted in the editing buffer and
+persists after the editing buffer is closed.")
+
 ;;; Functions
 ;;;; Non-interactive Functions
 ;;;;; Get Buffer Mode and Language Name
@@ -1226,8 +1231,9 @@ source-block. Use `outorg-beginning-of-code' and
     (goto-char outorg-beginning-of-code)
 
     ;; Display blank line between text and block
-    (overlay-put (make-overlay (1- (point)) (1- (point)))
-                 'before-string "\n")
+    (when outorg-ensure-blank-line
+      (overlay-put (make-overlay (1- (point)) (1- (point)))
+                   'before-string "\n"))
 
     (newline)
     (forward-line -1)
