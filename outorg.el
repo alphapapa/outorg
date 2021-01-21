@@ -253,7 +253,9 @@ names.")
 
 (defconst outorg-tracked-markers '(point-marker
                                    beg-of-subtree-marker mark-marker)
-  "Outorg markers to be tracked. The actual marker names are constructed by adding a prefix, either 'outorg-code-buffer-' or 'outorg-edit-buffer-'.")
+  "Outorg markers to be tracked.
+The actual marker names are constructed by adding a prefix,
+either 'outorg-code-buffer-' or 'outorg-edit-buffer-'.")
 
 (defconst outorg-tracked-org-markers '(org-clock-marker
                                        org-clock-hd-marker org-clock-default-task
@@ -566,16 +568,16 @@ If MODE-NAME is nil, check if Org-Babel identifier of major-mode of current buff
     ;; being killed. This is because temporary buffers may be created
     ;; by various org commands, and when those buffers are killed, we
     ;; do not want the outorg kill hooks to run.
-    (org-add-hook 'kill-buffer-hook
-                  (lambda ()
-                    (when (string= (buffer-name) outorg-edit-buffer-name)
-                      (outorg-save-edits-to-tmp-file)))
-                  nil 'local)
+    (add-hook 'kill-buffer-hook
+	      (lambda ()
+		(when (string= (buffer-name) outorg-edit-buffer-name)
+		  (outorg-save-edits-to-tmp-file)))
+	      nil 'local)
 
-    (org-add-hook 'kill-buffer-hook
-                  (lambda ()
-                    (when (string= (buffer-name) outorg-edit-buffer-name)
-                      (outorg-reset-global-vars)) nil 'local))
+    (add-hook 'kill-buffer-hook
+	      (lambda ()
+		(when (string= (buffer-name) outorg-edit-buffer-name)
+		  (outorg-reset-global-vars)) nil 'local))
 
 
     ;; (setq buffer-offer-save t)
@@ -598,8 +600,8 @@ If MODE-NAME is nil, check if Org-Babel identifier of major-mode of current buff
 
 
 ;; (org-add-hook 'outorg-edit-minor-mode-hook 'outorg-edit-minor-mode)
-(org-add-hook 'outorg-edit-minor-mode-hook
-              'outorg-edit-configure-buffer)
+(add-hook 'outorg-edit-minor-mode-hook
+	  'outorg-edit-configure-buffer)
 
 ;;;;; Backup Edit Buffer
 
@@ -1198,9 +1200,9 @@ otherwise the current subtree."
 
     ;; Set outline visibility
     (if (not outorg-edit-whole-buffer-p)
-        (show-all)
-      (hide-sublevels 3)
-      (ignore-errors (show-subtree))
+	(outline-show-all)
+      (outline-hide-sublevels 3)
+      (ignore-errors (outline-show-subtree))
 
       ;; Insert export template
       (cond (outorg-ask-user-for-export-template-file-p
